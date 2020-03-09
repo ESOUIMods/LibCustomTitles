@@ -76,13 +76,13 @@ Changes: Rewrote how custom titles are added and stored to help reduce conflict 
 	(v20)
 	- Added option to replace a title globally.
 ]]--
-local libName = "LibCustomTitles"
+local libName, libVersion = "LibCustomTitles", 45
 if not LibStub then return end
-LibStub:NewLibrary(libName, 100)
+LibStub:NewLibrary(libName, libVersion)
 EVENT_MANAGER:UnregisterForEvent(libName, EVENT_ADD_ON_LOADED)
 
 local libLoaded
-local LIB_NAME, VERSION = "LibCustomTitlesN", 4.5
+local LIB_NAME, VERSION = libName, libVersion
 local LibCustomTitles, oldminor = LibStub:NewLibrary(LIB_NAME, VERSION)
 if not LibCustomTitles then return end
 
