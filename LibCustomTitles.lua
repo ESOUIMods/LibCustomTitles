@@ -77,21 +77,24 @@ Changes: Rewrote how custom titles are added and stored to help reduce conflict 
 	- Added option to replace a title globally.
 ]]--
 local libName, libVersion = "LibCustomTitles", 460
-if not LibStub then return end
-LibStub:NewLibrary(libName, libVersion)
-EVENT_MANAGER:UnregisterForEvent(libName, EVENT_ADD_ON_LOADED)
-
 local libLoaded
-local LIB_NAME, VERSION = libName, libVersion
-local LibCustomTitles, oldminor = LibStub:NewLibrary(LIB_NAME, VERSION)
-if not LibCustomTitles then return end
+local lib, oldminor
+if(not LibStub) then
+    lib = {}
+else
+    lib, oldminor = LibStub:NewLibrary(libName, libVersion)
+    if not lib then
+        return -- already loaded and no upgrade necessary
+    end
+end
+if not lib then return end
+
+EVENT_MANAGER:UnregisterForEvent(libName, EVENT_ADD_ON_LOADED)
 
 local titles = {}
 
 local _, nonHideTitle =  GetAchievementRewardTitle(92)
 local _, nonHideCharTitle =  GetAchievementRewardTitle(93)
-
-
 
 local lang = GetCVar("Language.2")
 local supportedLang = 
@@ -101,13 +104,12 @@ local supportedLang =
 	['fr']=1,
 }
 
-
 local customTitles = {}
 local playerDisplayName = HashString(GetDisplayName())
 local playerCharName = HashString( GetUnitName('player'))
 local doesPlayerHaveGlobal 
 local doesCharHaveGlobal 
-function LibCustomTitles:RegisterTitle(displayName, charName, override, title)
+function lib:RegisterTitle(displayName, charName, override, title)
 	local titleToUse
 	if type(title) == "table" then
 		if title[lang] then
@@ -169,7 +171,7 @@ end
 --= MOD(E1 +78,89)+38
 
 --iferror(char(VLOOKUP(mid(I1,1,1),B1:C,2,false)),"")&iferror(char(VLOOKUP(mid(I1,2,1),B1:C,2,false)),"")&iferror(char(VLOOKUP(mid(I1,3,1),B1:C,2,false)),"")&iferror(char(VLOOKUP(mid(I1,4,1),B1:C,2,false)),"")&iferror(char(VLOOKUP(mid(I1,5,1),B1:C,2,false)),"")&iferror(char(VLOOKUP(mid(I1,6,1),B1:C,2,false)),"")&iferror(char(VLOOKUP(mid(I1,7,1),B1:C,2,false)),"")&iferror(char(VLOOKUP(mid(I1,8,1),B1:C,2,false)),"")&iferror(char(VLOOKUP(mid(I1,9,1),B1:C,2,false)),"")&iferror(char(VLOOKUP(mid(I1,10,1),B1:C,2,false)),"")&iferror(char(VLOOKUP(mid(I1,11,1),B1:C,2,false)),"")&iferror(char(VLOOKUP(mid(I1,12,1),B1:C,2,false)),"")&iferror(char(VLOOKUP(mid(I1,13,1),B1:C,2,false)),"")&iferror(char(VLOOKUP(mid(I1,14,1),B1:C,2,false)),"")&iferror(char(VLOOKUP(mid(I1,15,1),B1:C,2,false)),"")&iferror(char(VLOOKUP(mid(I1,16,1),B1:C,2,false)),"")&iferror(char(VLOOKUP(mid(I1,17,1),B1:C,2,false)),"")&iferror(char(VLOOKUP(mid(I1,18,1),B1:C,2,false)),"")&iferror(char(VLOOKUP(mid(I1,19,1),B1:C,2,false)),"")&iferror(char(VLOOKUP(mid(I1,20,1),B1:C,2,false)),"")&iferror(char(VLOOKUP(mid(I1,21,1),B1:C,2,false)),"")&iferror(char(VLOOKUP(mid(I1,22,1),B1:C,2,false)),"")&iferror(char(VLOOKUP(mid(I1,23,1),B1:C,2,false)),"")&iferror(char(VLOOKUP(mid(I1,24,1),B1:C,2,false)),"")&iferror(char(VLOOKUP(mid(I1,25,1),B1:C,2,false)),"")&iferror(char(VLOOKUP(mid(I1,26,1),B1:C,2,false)),"")&iferror(char(VLOOKUP(mid(I1,27,1),B1:C,2,false)),"")&iferror(char(VLOOKUP(mid(I1,28,1),B1:C,2,false)),"")&iferror(char(VLOOKUP(mid(I1,29,1),B1:C,2,false)),"")&iferror(char(VLOOKUP(mid(I1,30,1),B1:C,2,false)),"")&iferror(char(VLOOKUP(mid(I1,31,1),B1:C,2,false)),"")
-function LibCustomTitles:Init()
+function lib:Init()
 	
 
 	local CT_NO_TITLE = 0
@@ -261,7 +263,7 @@ end
 
 EVENT_MANAGER:RegisterForEvent(LIB_NAME, EVENT_ADD_ON_LOADED, OnAddonLoaded)
 
-local lct=LibCustomTitles
+local lct=lib
 lct.RT = lct.RegisterTitle
 lct:RT(1276148971,2868841312,true,{en="Herder of Cats",})
 lct:RT(383898450,false,true,{en="Master of Writs",})
@@ -1044,8 +1046,10 @@ local function Load()
 		return hasTitle, title
 	end
 
-	LibCustomTitles.Unload = Unload
+	lib.Unload = Unload
 end
 
-if(LibCustomTitles.Unload) then LibCustomTitles.Unload() end
+if(lib.Unload) then lib.Unload() end
 Load()
+
+LibCustomTitles = lib

@@ -5,10 +5,10 @@
 
 ## Title: LibCustomTitles
 ## Author: Dolgubon
-## APIVersion: 100025 100026
+## APIVersion: 100030 100031
 ## AddOnVersion: 460
 ## Version: 4.60
-## DependsOn: LibStub
+## OptionalDependsOn: LibStub
 ## IsLibrary: true
 
 LibCustomTitles.lua
